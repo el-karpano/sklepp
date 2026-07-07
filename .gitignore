@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+venv/
+*.db
+*.log
+node_modules/
+.mimocode/
+.playwright-mcp/
+.agents/

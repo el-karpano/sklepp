@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ product.name }} — SKLEPP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Raleway:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--gold:#c9a84c;--gold-lt:#e0c068;--gold-dk:#8a6f2f;--white:#f0ece4;--grey:#6b6560;--card:#161616;--border:rgba(201,168,76,.08);--heading:'Cormorant Garamond',serif;--body:'Raleway',sans-serif}
+html{scroll-behavior:smooth}
+body{font-family:var(--body);background:var(--bg);color:var(--white);overflow-x:hidden;line-height:1.7;font-weight:300}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:var(--body)}
+
+.region-indicator{padding:6px 14px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);border-radius:8px;font-size:11px;color:var(--grey);display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .3s}
+.region-indicator:hover{border-color:var(--gold)}
+.region-indicator .ri-flag{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:1px}
+.region-indicator .ri-change{color:var(--gold);font-weight:500}
+.cart-link{position:relative;color:#fff;text-decoration:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(255,255,255,.08);transition:all .3s}
+.cart-link:hover{background:rgba(201,168,76,.15)}
+.cart-link svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:1.5}
+.cart-badge{position:absolute;top:-4px;right:-4px;background:var(--gold);color:var(--bg);font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;display:none;align-items:center;justify-content:center;border:2px solid var(--bg)}
+
+.container{max-width:900px;margin:0 auto;padding:100px 24px 24px}
+.back{display:inline-flex;align-items:center;gap:8px;color:var(--grey);text-decoration:none;font-size:12px;font-weight:500;margin-bottom:32px;transition:color .3s;letter-spacing:1.5px;text-transform:uppercase}
+.back:hover{color:var(--gold)}
+.back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+
+.product-image{width:50%;max-height:400px;object-fit:contain;border-radius:16px;background:#fff;padding:20px;margin:0 auto 32px;display:block;transition:transform .4s}
+.product-image:hover{transform:scale(1.02)}
+.no-photo{width:100%;height:320px;background:linear-gradient(135deg,#1a1a1a 0%,#111 100%);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:rgba(201,168,76,.2);margin-bottom:32px;border-radius:16px}
+
+.product-info{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:36px;margin-bottom:24px;border-radius:16px}
+.product-name{font-family:var(--heading);font-size:32px;font-weight:300;margin-bottom:16px;line-height:1.3}
+.product-desc{font-size:14px;color:var(--grey);line-height:1.8;margin-bottom:20px}
+.product-price{font-family:var(--heading);font-size:36px;color:var(--gold);margin-bottom:4px}
+.product-price .currency{font-size:18px;font-weight:300;color:var(--grey)}
+.product-price-sub{font-size:13px;color:var(--grey);margin-bottom:20px}
+.min-order{display:inline-block;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.08);color:var(--gold);padding:8px 16px;border-radius:6px;font-size:12px;font-weight:500;margin-bottom:20px}
+
+.qty-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.qty-label{font-size:13px;font-weight:400;color:var(--grey)}
+.qty-controls{display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.qty-btn{width:48px;height:48px;border:none;background:var(--bg);cursor:pointer;font-size:20px;font-weight:400;color:var(--gold);transition:all .3s;font-family:var(--body);flex-shrink:0}
+.qty-btn:hover{background:rgba(201,168,76,.1)}
+.qty-input{width:56px;height:48px;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);background:var(--card);text-align:center;font-size:16px;font-weight:600;font-family:var(--body);color:var(--white);flex-shrink:0}
+.qty-input:focus{outline:none}
+
+@media(max-width:600px){
+  .qty-controls{width:100%}
+  .qty-btn{flex:1;width:auto}
+  .qty-input{flex:1;width:auto}
+}
+
+.btn-add-cart{display:block;width:100%;padding:16px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--body);background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:var(--bg);transition:all .3s;letter-spacing:1.5px;text-transform:uppercase}
+.btn-add-cart:hover{box-shadow:0 4px 16px rgba(201,168,76,.2);transform:translateY(-1px)}
+.btn-go-cart{display:block;width:100%;padding:14px;border:1px solid rgba(201,168,76,.2);border-radius:8px;cursor:pointer;font-size:12px;font-weight:500;font-family:var(--body);background:transparent;color:var(--gold);text-align:center;text-decoration:none;transition:all .3s;letter-spacing:1.5px;text-transform:uppercase;margin-top:10px}
+.btn-go-cart:hover{border-color:var(--gold);background:rgba(201,168,76,.05)}
+
+.added-msg{display:none;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);color:var(--gold);padding:14px;border-radius:8px;text-align:center;font-size:13px;font-weight:500;margin-top:12px}
+.added-msg a{color:var(--gold);font-weight:700}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--card);color:var(--gold);padding:12px 28px;border-radius:12px;font-size:13px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.4);border:1px solid rgba(201,168,76,.15);z-index:10000;transition:transform .4s cubic-bezier(.4,0,.2,1);pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+
+.intro-overlay{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 1.2s,visibility 1.2s}
+.intro-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.intro-watermark{position:absolute;top:0;right:0;z-index:2;padding:0;width:320px;height:110px;background:#050508;border-bottom-left-radius:14px;border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-size:22px;font-weight:400;letter-spacing:8px;color:rgba(201,168,76,.6);pointer-events:none}
+.intro-text-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;opacity:0;transition:opacity 1.5s ease;pointer-events:none}
+.intro-text-overlay.visible{opacity:1;pointer-events:auto}
+.intro-text-box{text-align:center;max-width:520px;padding:44px 40px;background:rgba(5,5,8,.78);border-radius:12px;backdrop-filter:blur(16px);border:1px solid rgba(201,168,76,.1);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.intro-text-box h1{font-family:var(--heading);font-size:clamp(36px,5vw,56px);font-weight:300;letter-spacing:6px;margin-bottom:12px;color:var(--white)}
+.intro-text-box .intro-welcome{font-size:14px;font-weight:300;color:rgba(240,236,228,.85);line-height:1.8;margin-bottom:8px;letter-spacing:1px}
+.intro-text-box .intro-desc{font-size:13px;font-weight:300;color:rgba(240,236,228,.55);line-height:1.9;margin-bottom:32px;letter-spacing:.5px}
+.intro-text-box .intro-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 28px}
+.intro-text-box .intro-question{font-family:var(--heading);font-size:20px;font-weight:400;color:var(--white);margin-bottom:28px}
+.region-btns{display:flex;gap:20px;justify-content:center}
+.region-btn{padding:16px 52px;background:transparent;border:1px solid rgba(201,168,76,.3);color:var(--white);font-family:var(--body);font-size:11px;font-weight:500;letter-spacing:4px;text-transform:uppercase;transition:all .5s;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+.region-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gold),var(--gold-dk));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.4,0,.2,1);z-index:-1}
+.region-btn:hover{color:var(--bg);border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,.15)}
+.region-btn:hover::before{transform:scaleX(1)}
+
+
+@media(max-width:768px){
+  .container{padding:80px 16px 16px}
+  .product-image{width:80%}
+  .product-name{font-size:26px}
+  .product-price{font-size:30px}
+  .product-info{padding:24px}
+}
+
+#preloader{position:fixed;inset:0;background:var(--bg);z-index:100000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:32px;transition:opacity .8s,visibility .8s}
+#preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+.pre-loader{position:relative;width:80px;height:80px}
+.pre-loader::before{content:'';position:absolute;inset:0;border:2px solid transparent;border-top-color:var(--gold);border-radius:50%;animation:spin 1.2s linear infinite}
+.pre-loader::after{content:'';position:absolute;inset:8px;border:2px solid transparent;border-bottom-color:rgba(201,168,76,.4);border-radius:50%;animation:spin 1.8s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pre-text{font-family:var(--heading);font-size:14px;letter-spacing:10px;text-transform:uppercase;color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div id="preloader">
+  <div class="pre-loader"></div>
+  <div class="pre-text">SKLEPP</div>
+</div>
+
+<div class="bg-video">
+  <video autoplay muted playsinline loop preload="auto">
+    <source src="/static/bg-video.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- Intro Overlay -->
+<div class="intro-overlay" id="introOverlay">
+  <video class="intro-video" id="introVideo" muted playsinline autoplay>
+    <source src="/static/intro-video.mp4" type="video/mp4">
+  </video>
+  <div class="intro-watermark">SKLEPP</div>
+  <div class="intro-text-overlay" id="introText">
+    <div class="intro-text-box">
+      <h1>SKLEPP</h1>
+      <p class="intro-welcome">Добро пожаловать</p>
+      <p class="intro-desc">Производитель ритуальной фурнитуры для агентств по Беларуси и России. Качественные изделия с полным контролем производства.</p>
+      <div class="intro-divider"></div>
+      <p class="intro-question">Выберите ваш регион</p>
+      <div class="region-btns">
+        <button class="region-btn" onclick="selectRegion('RU')">Россия</button>
+        <button class="region-btn" onclick="selectRegion('BY')">Беларусь</button>
+      </div>
+    </div>
+  </div>
+</div><!-- Header -->
+<header class="header solid">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-brand">
+        <a href="/"><h1>S<span>K</span>LEPP</h1></a>
+        <span class="header-sub">Ритуальная фурнитура</span>
+      </div>
+      <nav class="main-nav">
+        <a href="/">Главная</a>
+        <a href="/catalog">Каталог</a>
+        <a href="/about">О нас</a>
+        <a href="/delivery">Доставка</a>
+        <a href="/contacts">Контакты</a>
+        <a href="/faq">Вопросы</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <div class="region-indicator" id="regionIndicator" onclick="showIntro()" style="display:none">
+        <span class="ri-flag" id="riFlag">RU</span>
+        <span id="riName">Россия</span>
+        <span class="ri-change">Сменить</span>
+      </div>
+      <a href="/cart" class="cart-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span class="cart-badge" id="cart-badge">0</span>
+      </a>
+      <button class="burger" id="burger" onclick="toggleMobile()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-close" onclick="toggleMobile()">✕</button>
+  <a href="/" onclick="toggleMobile()">Главная</a>
+  <a href="/catalog" onclick="toggleMobile()">Каталог</a>
+  <a href="/about" onclick="toggleMobile()">О нас</a>
+  <a href="/delivery" onclick="toggleMobile()">Доставка</a>
+  <a href="/contacts" onclick="toggleMobile()">Контакты</a>
+  <a href="/faq" onclick="toggleMobile()">Вопросы</a>
+  <a href="/cart" onclick="toggleMobile()">Корзина</a>
+</div>
+
+<div class="container">
+  <a href="/catalog" class="back">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    Назад к каталогу
+  </a>
+
+  {% set photo_url = get_photo_url(product.image_url) %}
+  {% if photo_url %}
+    <img src="{{ photo_url }}" class="product-image" alt="{{ product.name }}">
+  {% else %}
+    <div class="no-photo">Нет фото</div>
+  {% endif %}
+
+  <div class="product-info">
+    <div class="product-name">{{ product.name }}</div>
+    {% if product.description %}
+      <div class="product-desc">{{ product.description }}</div>
+    {% endif %}
+    <div class="product-price price-display" data-byn="{{ product.price_byn }}" data-rub="{{ product.price_rub }}">{{ product.price_byn }} <span class="currency">Br</span></div>
+    {% set moq = product.min_order if product.min_order else 1 %}
+    {% if moq > 1 %}
+      <div class="min-order">Мин. заказ: {{ moq }} шт.</div>
+    {% endif %}
+
+    <div class="qty-row">
+      <span class="qty-label">Количество:</span>
+      <div class="qty-controls">
+        <button class="qty-btn" onclick="changeQty(-{{ moq }})">−</button>
+        <input type="number" class="qty-input" id="qtyInput" value="{{ moq }}" min="{{ moq }}" step="{{ moq }}">
+        <button class="qty-btn" onclick="changeQty({{ moq }})">+</button>
+      </div>
+    </div>
+
+    <button class="btn-add-cart" id="addCartBtn" onclick="addToCart()">Добавить в корзину</button>
+    <div class="added-msg" id="addedMsg">
+      Добавлено! <a href="/cart">Перейти в корзину →</a>
+    </div>
+    <a href="/cart" class="btn-go-cart">Перейти в корзину</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-main">
+    <div class="footer-brand">
+      <h3>S<span>K</span>LEPP</h3>
+      <p>Производитель ритуальной фурнитуры для агентств по Беларуси и России. Качественные изделия с полным контролем производства.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Навигация</h4>
+      <ul>
+        <li><a href="/">Главная</a></li>
+        <li><a href="/catalog">Каталог</a></li>
+        <li><a href="/about">О компании</a></li>
+        <li><a href="/delivery">Доставка и оплата</a></li>
+        <li><a href="/contacts">Контакты</a></li>
+        <li><a href="/faq">Вопросы</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Каталог</h4>
+      <ul>
+        {% for cat in categories %}
+          <li><a href="/catalog?category={{ cat.id }}">{{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="footer-col footer-contacts">
+      <h4>Контакты</h4>
+      <p class="fc-label">Телефон</p>
+      <p>+375 (29) 683-23-03</p>
+      <p class="fc-label" style="margin-top:12px">Адрес</p>
+      <p>г. Барановичи, ул. Холостякова 63а</p>
+    </div>
+    <div class="footer-col footer-requisites">
+      <h4>Реквизиты</h4>
+      <p class="fc-label">УНП</p>
+      <p>291733213</p>
+      <p class="fc-label">Дата регистрации</p>
+      <p>18.01.2023</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 SKLEPP. Все права защищены.</span>
+    <span>
+      <a href="/privacy">Политика конфиденциальности</a> &nbsp;|&nbsp;
+      <a href="/offer">Публичная оферта</a> &nbsp;|&nbsp;
+      УНП 291733213
+    </span>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="/static/cart.js"></script>
+<script>
+const product = {{ product|tojson }};
+const MOQ = product.min_order || 1;
+let currentRegion = localStorage.getItem('sklepp_region') || null;
+
+function selectRegion(region) {
+  currentRegion = region;
+  localStorage.setItem('sklepp_region', region);
+  const introVideo = document.getElementById('introVideo');
+  if (introVideo) introVideo.pause();
+  document.getElementById('introOverlay').classList.add('hidden');
+  document.getElementById('regionIndicator').style.display = 'flex';
+  document.getElementById('riFlag').textContent = region === 'RU' ? 'RU' : 'BY';
+  document.getElementById('riName').textContent = region === 'RU' ? 'Россия (₽)' : 'Беларусь (Br)';
+  updatePrice();
+}
+
+function showIntro() {
+  const introOverlay = document.getElementById('introOverlay');
+  const introVideo = document.getElementById('introVideo');
+  const introText = document.getElementById('introText');
+  introOverlay.classList.remove('hidden');
+  document.getElementById('regionIndicator').style.display = 'none';
+  if (introVideo) {
+    introVideo.currentTime = 0;
+    introText.classList.remove('visible');
+    introVideo.play().catch(() => {});
+    function showIntroText() { introText.classList.add('visible'); }
+    introVideo.addEventListener('timeupdate', function handler() {
+      if (introVideo.duration && introVideo.currentTime >= introVideo.duration * 0.65) {
+        showIntroText();
+        introVideo.removeEventListener('timeupdate', handler);
+      }
+    });
+    setTimeout(showIntroText, 4000);
+  }
+}
+
+function updatePrice() {
+  const el = document.querySelector('.price-display');
+  if (currentRegion === 'RU' && product.price_rub) {
+    el.innerHTML = product.price_rub + ' <span class="currency">₽</span>';
+  } else {
+    const introVideo = document.getElementById('introVideo');
+    const introText = document.getElementById('introText');
+    function showIntroText() { introText.classList.add('visible'); }
+    if (introVideo) {
+      introVideo.play().catch(() => {});
+      introVideo.addEventListener('timeupdate', function() {
+        if (this.duration && this.currentTime >= this.duration * 0.65) showIntroText();
+      });
+      introVideo.addEventListener('ended', showIntroText);
+    }
+    setTimeout(showIntroText, 4000);
+  }
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('qtyInput');
+  let val = parseInt(input.value) || MOQ;
+  val = Math.max(MOQ, val + delta);
+  val = Math.round(val / MOQ) * MOQ;
+  input.value = val;
+}
+
+function addToCart() {
+  const qty = parseInt(document.getElementById('qtyInput').value) || MOQ;
+  const rounds = Math.floor(qty / MOQ);
+  for (let i = 0; i < rounds; i++) Cart.add(product);
+  document.getElementById('addCartBtn').style.display = 'none';
+  document.getElementById('addedMsg').style.display = 'block';
+  showToast('Добавлено в корзину');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function toggleMobile() {
+  document.getElementById('mobileNav').classList.toggle('open');
+  document.getElementById('burger').classList.toggle('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (currentRegion) {
+    document.getElementById('introOverlay').classList.add('hidden');
+    document.getElementById('regionIndicator').style.display = 'flex';
+    document.getElementById('riFlag').textContent = currentRegion === 'RU' ? 'RU' : 'BY';
+    document.getElementById('riName').textContent = currentRegion === 'RU' ? 'Россия (₽)' : 'Беларусь (Br)';
+    updatePrice();
+    const introVideo = document.getElementById('introVideo');
+    if (introVideo) introVideo.pause();
+  }
+  else {
+    const introVideo = document.getElementById('introVideo');
+    const introText = document.getElementById('introText');
+    if (introVideo) {
+      introVideo.play().catch(() => {});
+      introVideo.addEventListener('timeupdate', function() {
+        if (this.duration && this.currentTime >= this.duration * 0.72) {
+          introText.classList.add('visible');
+        }
+      });
+      introVideo.addEventListener('ended', function() {
+        introText.classList.add('visible');
+      });
+    }
+  }
+
+  const preloader = document.getElementById('preloader');
+  const bgVideo = document.querySelector('.bg-video video');
+  const bgVideoContainer = document.querySelector('.bg-video');
+
+  function hidePreloader() { preloader.classList.add('done'); }
+  function showVideo() { if (bgVideoContainer) bgVideoContainer.classList.add('ready'); }
+
+  if (bgVideo) {
+    bgVideo.addEventListener('canplay', showVideo, { once: true });
+    bgVideo.addEventListener('loadeddata', showVideo, { once: true });
+  }
+
+  setTimeout(hidePreloader, 2500);
+});
+
+// Smooth video loop
+document.querySelectorAll('.bg-video video').forEach(vid => {
+  vid.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>О компании — SKLEPP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Raleway:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.about-hero{padding:140px 0 60px;text-align:center}
+.about-hero .sec-tag{justify-content:center}
+.about-hero .sec-title{font-size:clamp(36px,5vw,56px)}
+
+.about-content{padding:0 0 80px}
+.about-block{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:80px}
+.about-block.reverse{direction:rtl}
+.about-block.reverse>*{direction:ltr}
+.about-img{position:relative;aspect-ratio:4/3;background:linear-gradient(135deg,#0a0a12,#111118);border:1px solid var(--border);overflow:hidden;border-radius:16px}
+.about-img::before{content:'';position:absolute;inset:0;background:rgba(5,5,8,.6);z-index:1}
+.about-img video{width:100%;height:100%;object-fit:cover;filter:brightness(.3) saturate(.5);will-change:transform}
+.about-img img{width:100%;height:100%;object-fit:cover;transition:transform .6s;z-index:0}
+.about-img:hover img{transform:scale(1.03)}
+.about-img:has(img)::before{display:none}
+.about-img:has(img)::after{display:none}
+.about-text-block{padding:20px 0}
+.about-text-block h2{font-family:var(--heading);font-size:clamp(28px,4vw,40px);font-weight:300;margin-bottom:20px}
+.about-text-block h2 em{font-style:italic;color:var(--gold)}
+.about-text-block p{font-size:15px;font-weight:200;color:var(--grey);line-height:2;margin-bottom:16px}
+
+.values-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:48px}
+.value-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);padding:40px 24px;text-align:center;transition:all .5s;position:relative;border-radius:16px}
+.value-card:hover{border-color:rgba(201,168,76,.12);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.2)}
+.value-icon{width:56px;height:56px;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.08);transition:all .4s}
+.value-card:hover .value-icon{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.15);transform:scale(1.05)}
+.value-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.value-card h3{font-family:var(--heading);font-size:18px;font-weight:400;margin-bottom:10px;color:rgba(240,236,228,.9)}
+.value-card p{font-size:13px;color:var(--grey);line-height:1.7;font-weight:300}
+@media(max-width:1024px){.values-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.values-grid{grid-template-columns:1fr}}
+
+@media(max-width:768px){
+  .about-block{grid-template-columns:1fr;gap:32px}
+  .about-block.reverse{direction:ltr}
+}
+
+/* Key Metrics */
+.metrics-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px}
+.metric-card{background:var(--card);border:1px solid var(--border);padding:36px 24px;text-align:center;border-radius:16px;transition:all .5s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.metric-card::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:40px;height:2px;background:var(--gold);transition:width .4s}
+.metric-card:hover{border-color:rgba(201,168,76,.2);transform:translateY(-5px);box-shadow:0 16px 40px rgba(0,0,0,.25)}
+.metric-card:hover::before{width:80px}
+.metric-icon{width:52px;height:52px;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.1);transition:all .4s}
+.metric-card:hover .metric-icon{background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.2);transform:scale(1.05)}
+.metric-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.metric-value{font-family:var(--heading);font-size:36px;font-weight:400;color:var(--gold);margin-bottom:6px;display:block}
+.metric-label{font-size:12px;color:var(--grey);letter-spacing:1px;text-transform:uppercase;font-weight:500}
+.metric-desc{font-size:12px;color:rgba(107,101,96,.7);margin-top:8px;line-height:1.6;font-weight:300}
+@media(max-width:768px){.metrics-row{grid-template-columns:1fr}}
+.metric-label{font-size:12px;color:var(--grey);letter-spacing:1px;text-transform:uppercase}
+
+#preloader{position:fixed;inset:0;background:var(--bg);z-index:100000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:32px;transition:opacity .8s,visibility .8s}
+#preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+.pre-loader{position:relative;width:80px;height:80px}
+.pre-loader::before{content:'';position:absolute;inset:0;border:2px solid transparent;border-top-color:var(--gold);border-radius:50%;animation:spin 1.2s linear infinite}
+.pre-loader::after{content:'';position:absolute;inset:8px;border:2px solid transparent;border-bottom-color:rgba(201,168,76,.4);border-radius:50%;animation:spin 1.8s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pre-text{font-family:var(--heading);font-size:14px;letter-spacing:10px;text-transform:uppercase;color:var(--gold)}
+
+.intro-overlay{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 1.2s,visibility 1.2s}
+.intro-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.intro-watermark{position:absolute;top:0;right:0;z-index:2;padding:0;width:320px;height:110px;background:#050508;border-bottom-left-radius:14px;border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-size:22px;font-weight:400;letter-spacing:8px;color:rgba(201,168,76,.6);pointer-events:none}
+.intro-text-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;opacity:0;transition:opacity 1.5s ease;pointer-events:none}
+.intro-text-overlay.visible{opacity:1;pointer-events:auto}
+.intro-text-box{text-align:center;max-width:520px;padding:44px 40px;background:rgba(5,5,8,.78);border-radius:12px;backdrop-filter:blur(16px);border:1px solid rgba(201,168,76,.1);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.intro-text-box h1{font-family:var(--heading);font-size:clamp(36px,5vw,56px);font-weight:300;letter-spacing:6px;margin-bottom:12px;color:var(--white)}
+.intro-text-box .intro-welcome{font-size:14px;font-weight:300;color:rgba(240,236,228,.85);line-height:1.8;margin-bottom:8px;letter-spacing:1px}
+.intro-text-box .intro-desc{font-size:13px;font-weight:300;color:rgba(240,236,228,.55);line-height:1.9;margin-bottom:32px;letter-spacing:.5px}
+.intro-text-box .intro-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 28px}
+.intro-text-box .intro-question{font-family:var(--heading);font-size:20px;font-weight:400;color:var(--white);margin-bottom:28px}
+.region-btns{display:flex;gap:20px;justify-content:center}
+.region-btn{padding:16px 52px;background:transparent;border:1px solid rgba(201,168,76,.3);color:var(--white);font-family:var(--body);font-size:11px;font-weight:500;letter-spacing:4px;text-transform:uppercase;transition:all .5s;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+.region-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gold),var(--gold-dk));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.4,0,.2,1);z-index:-1}
+.region-btn:hover{color:var(--bg);border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,.15)}
+.region-btn:hover::before{transform:scaleX(1)}
+</style>
+</head>
+<body>
+
+<div id="preloader">
+  <div class="pre-loader"></div>
+  <div class="pre-text">SKLEPP</div>
+</div>
+
+<div class="bg-video">
+  <video autoplay muted playsinline loop preload="auto">
+    <source src="/static/bg-video.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- Intro Overlay -->
+<div class="intro-overlay" id="introOverlay">
+  <video class="intro-video" id="introVideo" muted playsinline autoplay>
+    <source src="/static/intro-video.mp4" type="video/mp4">
+  </video>
+  <div class="intro-watermark">SKLEPP</div>
+  <div class="intro-text-overlay" id="introText">
+    <div class="intro-text-box">
+      <h1>SKLEPP</h1>
+      <p class="intro-welcome">Добро пожаловать</p>
+      <p class="intro-desc">Производитель ритуальной фурнитуры для агентств по Беларуси и России. Качественные изделия с полным контролем производства.</p>
+      <div class="intro-divider"></div>
+      <p class="intro-question">Выберите ваш регион</p>
+      <div class="region-btns">
+        <button class="region-btn" onclick="selectRegion('RU')">Россия</button>
+        <button class="region-btn" onclick="selectRegion('BY')">Беларусь</button>
+      </div>
+    </div>
+  </div>
+</div><!-- Header -->
+<header class="header solid">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-brand">
+        <a href="/"><h1>S<span>K</span>LEPP</h1></a>
+        <span class="header-sub">Ритуальная фурнитура</span>
+      </div>
+      <nav class="main-nav">
+        <a href="/">Главная</a>
+        <a href="/catalog">Каталог</a>
+        <a href="/about" class="active">О нас</a>
+        <a href="/delivery">Доставка</a>
+        <a href="/contacts">Контакты</a>
+        <a href="/faq">Вопросы</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <div class="region-indicator" id="regionIndicator" onclick="showIntro()" style="display:none">
+        <span class="ri-flag" id="riFlag">RU</span>
+        <span id="riName">Россия</span>
+        <span class="ri-change">Сменить</span>
+      </div>
+      <a href="/cart" class="cart-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span class="cart-badge" id="cart-badge">0</span>
+      </a>
+      <button class="burger" id="burger" onclick="toggleMobile()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-close" onclick="toggleMobile()">✕</button>
+  <a href="/" onclick="toggleMobile()">Главная</a>
+  <a href="/catalog" onclick="toggleMobile()">Каталог</a>
+  <a href="/about" onclick="toggleMobile()">О нас</a>
+  <a href="/delivery" onclick="toggleMobile()">Доставка</a>
+  <a href="/contacts" onclick="toggleMobile()">Контакты</a>
+  <a href="/faq" onclick="toggleMobile()">Вопросы</a>
+  <a href="/cart" onclick="toggleMobile()">Корзина</a>
+</div>
+
+<div class="about-hero">
+  <div class="container">
+    <div class="sec-tag">О компании</div>
+    <h1 class="sec-title">Производитель <em>с душой</em></h1>
+  </div>
+</div>
+
+<div class="container">
+  <div class="about-content">
+
+    <div class="about-block">
+      <div class="about-img">
+        <img src="/static/about-sklepp.jpg" alt="SKLEPP — ритуальная фурнитура">
+      </div>
+      <div class="about-text-block">
+        <h2>Надёжный <em>партнёр</em></h2>
+        <p>SKLEPP COMPANY LIMITED — компания с более чем 18-летним опытом в производстве ритуальных изделий, является приверженцем высоких стандартов качества и надёжности. Мы специализируемся на создании металлических крестов, накладок из фольги и ритуальных табличек, предлагая клиентам широкий выбор дизайнов и материалов.</p>
+        <p>Наше производство основано на передовых технологиях и строгом контроле качества, что обеспечивает продукцию, соответствующую самым высоким стандартам.</p>
+      </div>
+    </div>
+
+    <div class="about-block reverse">
+      <div class="about-img">
+        <img src="/static/about-quality.jpg" alt="Контроль качества SKLEPP">
+      </div>
+      <div class="about-text-block">
+        <h2>Контроль <em>качества</em></h2>
+        <p>Производство расположено в городе Барановичи, Республика Беларусь. Мы осуществляем внешний и внутренний контроль качества на всех этапах изготовления продукции.</p>
+        <p>За последние 8 лет наша компания стала символом надёжности и качества в производстве ритуальной фурнитуры, предоставляя клиентам низкие цены и высококачественную продукцию. Наша компания ценит доверие клиентов и гарантирует высокий уровень обслуживания на каждом этапе сотрудничества.</p>
+      </div>
+    </div>
+
+    <div class="about-block">
+      <div class="about-img">
+        <img src="/static/about-growth.jpg" alt="Рост и развитие SKLEPP">
+      </div>
+      <div class="about-text-block">
+        <h2>Рост и <em>развитие</em></h2>
+        <p>Мы производим нашу продукцию вот уже несколько лет. За последнее время количество наших клиентов значительно увеличилось. Мы являемся надёжным поставщиком нашей продукции не только в Республике Беларусь, но и в Российской Федерации тоже.</p>
+        <p>Постоянный рост объёмов производства и расширение ассортимента подтверждают доверие наших клиентов к качеству нашей продукции.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="stats-row" style="margin-top:24px">
+    <div class="stat">
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+      <div class="stat-num">2008</div>
+      <div class="stat-label">Год основания</div>
+      <div class="stat-desc">Работаем на рынке ритуальной фурнитуры с 2008 года</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div class="stat-num">18+</div>
+      <div class="stat-label">Лет опыта</div>
+      <div class="stat-desc">Накопленный опыт в производстве и поставках</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
+      <div class="stat-num">240+</div>
+      <div class="stat-label">Позиций в каталоге</div>
+      <div class="stat-desc">Широкий ассортимент для любых потребностей</div>
+    </div>
+    <div class="stat">
+      <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+      <div class="stat-num">2</div>
+      <div class="stat-label">Страны доставки</div>
+      <div class="stat-desc">Беларусь и Россия — доставка по всем регионам</div>
+    </div>
+  </div>
+
+  <!-- Key Metrics -->
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="metric-value">98.5%</div>
+        <div class="metric-label">Выполнение заказов в срок</div>
+        <div class="metric-desc">Берём на себя обязательства и выполняем их</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="metric-value">4.9/5</div>
+        <div class="metric-label">Средняя оценка клиентов</div>
+        <div class="metric-desc">Высокий рейтинг подтверждается отзывами</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <div class="metric-value">24/7</div>
+        <div class="metric-label">Поддержка клиентов</div>
+        <div class="metric-desc">Всегда на связи для решения любых вопросов</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="margin-top:80px">
+    <div class="sec-tag">Наши ценности</div>
+    <h2 class="sec-title">Почему <em>выбирают нас</em></h2>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><path d="M2 20h20M5 20V8l7-5 7 5v12M9 20v-6h6v6"/></svg>
+        </div>
+        <h3>Собственное производство</h3>
+        <p>Полный цикл изготовления продукции под контролем на каждом этапе</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        </div>
+        <h3>Контроль качества</h3>
+        <p>Внешний и внутренний контроль гарантируют безупречное качество каждого изделия</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <h3>Доставка по СНГ</h3>
+        <p>Работаем с клиентами по Беларуси, России и другим странам СНГ</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
+        <h3>Индивидуальный подход</h3>
+        <p>Гибкие условия сотрудничества и персональный менеджер для каждого клиента</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:80px"></div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-main">
+    <div class="footer-brand">
+      <h3>S<span>K</span>LEPP</h3>
+      <p>Производитель ритуальной фурнитуры для агентств по Беларуси и России. Качественные изделия с полным контролем производства.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Навигация</h4>
+      <ul>
+        <li><a href="/">Главная</a></li>
+        <li><a href="/catalog">Каталог</a></li>
+        <li><a href="/about">О компании</a></li>
+        <li><a href="/delivery">Доставка и оплата</a></li>
+        <li><a href="/contacts">Контакты</a></li>
+        <li><a href="/faq">Вопросы</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Каталог</h4>
+      <ul>
+        {% for cat in categories %}
+          <li><a href="/catalog?category={{ cat.id }}">{{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="footer-col footer-contacts">
+      <h4>Контакты</h4>
+      <p class="fc-label">Телефон</p>
+      <p>+375 (29) 683-23-03</p>
+      <p class="fc-label" style="margin-top:12px">Адрес</p>
+      <p>г. Барановичи, ул. Холостякова 63а</p>
+    </div>
+    <div class="footer-col footer-requisites">
+      <h4>Реквизиты</h4>
+      <p class="fc-label">УНП</p>
+      <p>291733213</p>
+      <p class="fc-label">Дата регистрации</p>
+      <p>18.01.2023</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 SKLEPP. Все права защищены.</span>
+    <span>
+      <a href="/privacy">Политика конфиденциальности</a> &nbsp;|&nbsp;
+      <a href="/offer">Публичная оферта</a> &nbsp;|&nbsp;
+      УНП 291733213
+    </span>
+  </div>
+</footer>
+
+<div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</div>
+
+<script src="/static/cart.js"></script>
+<script>
+let currentRegion = localStorage.getItem('sklepp_region') || null;
+
+function selectRegion(region) {
+  currentRegion = region;
+  localStorage.setItem('sklepp_region', region);
+  const introVideo = document.getElementById('introVideo');
+  if (introVideo) introVideo.pause();
+  document.getElementById('introOverlay').classList.add('hidden');
+  document.getElementById('regionIndicator').style.display = 'flex';
+  document.getElementById('riFlag').textContent = region === 'RU' ? 'RU' : 'BY';
+  document.getElementById('riName').textContent = region === 'RU' ? 'Россия (₽)' : 'Беларусь (Br)';
+  updatePrices();
+}
+
+function showIntro() {
+  const introOverlay = document.getElementById('introOverlay');
+  const introVideo = document.getElementById('introVideo');
+  const introText = document.getElementById('introText');
+  introOverlay.classList.remove('hidden');
+  document.getElementById('regionIndicator').style.display = 'none';
+  if (introVideo) {
+    introVideo.currentTime = 0;
+    introText.classList.remove('visible');
+    introVideo.play().catch(() => {});
+    function showIntroText() { introText.classList.add('visible'); }
+    introVideo.addEventListener('timeupdate', function handler() {
+      if (introVideo.duration && introVideo.currentTime >= introVideo.duration * 0.65) {
+        showIntroText();
+        introVideo.removeEventListener('timeupdate', handler);
+      }
+    });
+    setTimeout(showIntroText, 4000);
+  }
+}
+
+function updatePrices() {
+  document.querySelectorAll('.price-display').forEach(el => {
+    const byn = el.dataset.byn;
+    const rub = el.dataset.rub;
+    if (currentRegion === 'RU' && rub) {
+      el.innerHTML = rub + ' <span class="currency">₽</span>';
+  } else {
+    const introVideo = document.getElementById('introVideo');
+    const introText = document.getElementById('introText');
+    function showIntroText() { introText.classList.add('visible'); }
+    if (introVideo) {
+      introVideo.play().catch(() => {});
+      introVideo.addEventListener('timeupdate', function() {
+        if (this.duration && this.currentTime >= this.duration * 0.65) showIntroText();
+      });
+      introVideo.addEventListener('ended', showIntroText);
+    }
+    setTimeout(showIntroText, 4000);
+  }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (currentRegion) {
+    document.getElementById('introOverlay').classList.add('hidden');
+    document.getElementById('regionIndicator').style.display = 'flex';
+    document.getElementById('riFlag').textContent = currentRegion === 'RU' ? 'RU' : 'BY';
+    document.getElementById('riName').textContent = currentRegion === 'RU' ? 'Россия (₽)' : 'Беларусь (Br)';
+    const introVideo = document.getElementById('introVideo');
+    if (introVideo) introVideo.pause();
+  }
+  else {
+    const introVideo = document.getElementById('introVideo');
+    const introText = document.getElementById('introText');
+    if (introVideo) {
+      introVideo.play().catch(() => {});
+      introVideo.addEventListener('timeupdate', function() {
+        if (this.duration && this.currentTime >= this.duration * 0.72) {
+          introText.classList.add('visible');
+        }
+      });
+      introVideo.addEventListener('ended', function() {
+        introText.classList.add('visible');
+      });
+    }
+  }
+
+  const preloader = document.getElementById('preloader');
+  const bgVideo = document.querySelector('.bg-video video');
+  const bgVideoContainer = document.querySelector('.bg-video');
+
+  function hidePreloader() { preloader.classList.add('done'); }
+  function showVideo() { if (bgVideoContainer) bgVideoContainer.classList.add('ready'); }
+
+  if (bgVideo) {
+    bgVideo.addEventListener('canplay', showVideo, { once: true });
+    bgVideo.addEventListener('loadeddata', showVideo, { once: true });
+  }
+
+  setTimeout(hidePreloader, 2500);
+});
+
+function toggleMobile() {
+  document.getElementById('mobileNav').classList.toggle('open');
+  document.getElementById('burger').classList.toggle('active');
+}
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('vis', window.scrollY > 500);
+});
+
+// Smooth video loop
+document.querySelectorAll('video').forEach(vid => {
+  vid.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+  });
+});
+
+// Animate charts on scroll
+const animateCharts = () => {
+  // Animate horizontal bars
+  document.querySelectorAll('.hbar-row').forEach((row, i) => {
+    const rect = row.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.9) {
+      setTimeout(() => {
+        row.classList.add('visible');
+      }, i * 100);
+    }
+  });
+
+  // Animate metric cards
+  document.querySelectorAll('.metric-card').forEach((card, i) => {
+    const rect = card.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.85) {
+      setTimeout(() => {
+        card.classList.add('visible');
+      }, i * 200);
+    }
+  });
+};
+
+window.addEventListener('scroll', animateCharts);
+window.addEventListener('load', () => {
+  setTimeout(animateCharts, 300);
+});
+</script>
+</body>
+</html>

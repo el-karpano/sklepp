@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Контакты — SKLEPP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Raleway:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<style>
+.contacts-hero{padding:140px 0 60px;text-align:center}
+.contacts-hero .sec-tag{justify-content:center}
+.contacts-hero .sec-title{font-size:clamp(36px,5vw,56px)}
+
+.contacts-content{padding:0 0 80px}
+.contacts-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;margin-top:48px}
+.contacts-info{display:flex;flex-direction:column;gap:20px}
+.contact-card{background:var(--card);border:1px solid var(--border);padding:28px 24px;display:flex;gap:16px;align-items:flex-start;transition:all .5s;backdrop-filter:blur(12px)}
+.contact-card:hover{border-color:rgba(201,168,76,.15);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.contact-icon{width:48px;height:48px;border-radius:10px;background:rgba(201,168,76,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.contact-icon svg{width:24px;height:24px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.contact-text h3{font-family:var(--heading);font-size:18px;font-weight:400;margin-bottom:4px}
+.contact-text p{font-size:13px;color:var(--grey);line-height:1.6}
+.contact-text a{color:var(--gold);transition:color .3s}
+.contact-text a:hover{color:var(--gold-lt)}
+
+.work-hours{background:var(--card);border:1px solid var(--border);padding:28px 24px;backdrop-filter:blur(12px)}
+.work-hours h3{font-family:var(--heading);font-size:20px;font-weight:400;margin-bottom:16px}
+.hours-table{width:100%}
+.hours-table tr{border-bottom:1px solid var(--border)}
+.hours-table tr:last-child{border-bottom:none}
+.hours-table td{padding:10px 0;font-size:13px;color:var(--grey)}
+.hours-table td:first-child{color:var(--white);font-weight:400}
+
+.contact-form-card{background:var(--card);border:1px solid var(--border);padding:32px 28px;backdrop-filter:blur(12px)}
+.contact-form-card h3{font-family:var(--heading);font-size:24px;font-weight:400;margin-bottom:20px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:500;margin-bottom:6px;color:var(--grey);letter-spacing:.5px}
+.form-group input,.form-group textarea{width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--body);transition:all .3s;background:var(--bg2);color:var(--white);font-weight:300}
+.form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.08)}
+.form-group textarea{resize:vertical;min-height:100px}
+.form-group input::placeholder,.form-group textarea::placeholder{color:rgba(107,101,96,.6)}
+.btn-submit{display:block;width:100%;padding:16px;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--body);background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:var(--bg);margin-top:8px;transition:all .3s;letter-spacing:1.5px;text-transform:uppercase}
+.btn-submit:hover{box-shadow:0 4px 16px rgba(201,168,76,.2);transform:translateY(-1px)}
+
+.map-wrap{margin-top:40px;border:1px solid var(--border);overflow:hidden;height:350px;background:var(--card)}
+.map-wrap iframe{width:100%;height:100%;border:none;filter:brightness(.8) contrast(1.1) saturate(.6) hue-rotate(180deg) invert(1)}
+
+@media(max-width:768px){
+  .contacts-grid{grid-template-columns:1fr}
+}
+
+#preloader{position:fixed;inset:0;background:var(--bg);z-index:100000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:32px;transition:opacity .8s,visibility .8s}
+#preloader.done{opacity:0;visibility:hidden;pointer-events:none}
+.pre-loader{position:relative;width:80px;height:80px}
+.pre-loader::before{content:'';position:absolute;inset:0;border:2px solid transparent;border-top-color:var(--gold);border-radius:50%;animation:spin 1.2s linear infinite}
+.pre-loader::after{content:'';position:absolute;inset:8px;border:2px solid transparent;border-bottom-color:rgba(201,168,76,.4);border-radius:50%;animation:spin 1.8s linear infinite reverse}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pre-text{font-family:var(--heading);font-size:14px;letter-spacing:10px;text-transform:uppercase;color:var(--gold)}
+
+.intro-overlay{position:fixed;inset:0;z-index:99999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 1.2s,visibility 1.2s}
+.intro-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.intro-watermark{position:absolute;top:0;right:0;z-index:2;padding:0;width:320px;height:110px;background:#050508;border-bottom-left-radius:14px;border-bottom:1px solid rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;font-family:var(--heading);font-size:22px;font-weight:400;letter-spacing:8px;color:rgba(201,168,76,.6);pointer-events:none}
+.intro-text-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:3;opacity:0;transition:opacity 1.5s ease;pointer-events:none}
+.intro-text-overlay.visible{opacity:1;pointer-events:auto}
+.intro-text-box{text-align:center;max-width:520px;padding:44px 40px;background:rgba(5,5,8,.78);border-radius:12px;backdrop-filter:blur(16px);border:1px solid rgba(201,168,76,.1);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.intro-text-box h1{font-family:var(--heading);font-size:clamp(36px,5vw,56px);font-weight:300;letter-spacing:6px;margin-bottom:12px;color:var(--white)}
+.intro-text-box .intro-welcome{font-size:14px;font-weight:300;color:rgba(240,236,228,.85);line-height:1.8;margin-bottom:8px;letter-spacing:1px}
+.intro-text-box .intro-desc{font-size:13px;font-weight:300;color:rgba(240,236,228,.55);line-height:1.9;margin-bottom:32px;letter-spacing:.5px}
+.intro-text-box .intro-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 28px}
+.intro-text-box .intro-question{font-family:var(--heading);font-size:20px;font-weight:400;color:var(--white);margin-bottom:28px}
+.region-btns{display:flex;gap:20px;justify-content:center}
+.region-btn{padding:16px 52px;background:transparent;border:1px solid rgba(201,168,76,.3);color:var(--white);font-family:var(--body);font-size:11px;font-weight:500;letter-spacing:4px;text-transform:uppercase;transition:all .5s;position:relative;overflow:hidden;backdrop-filter:blur(10px)}
+.region-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gold),var(--gold-dk));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.4,0,.2,1);z-index:-1}
+.region-btn:hover{color:var(--bg);border-color:var(--gold);box-shadow:0 0 30px rgba(201,168,76,.15)}
+.region-btn:hover::before{transform:scaleX(1)}
+</style>
+</head>
+<body>
+
+<div id="preloader">
+  <div class="pre-loader"></div>
+  <div class="pre-text">SKLEPP</div>
+</div>
+
+<div class="bg-video">
+  <video autoplay muted playsinline loop preload="auto">
+    <source src="/static/bg-video.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- Intro Overlay -->
+<div class="intro-overlay" id="introOverlay">
+  <video class="intro-video" id="introVideo" muted playsinline autoplay>
+    <source src="/static/intro-video.mp4" type="video/mp4">
+  </video>
+  <div class="intro-watermark">SKLEPP</div>
+  <div class="intro-text-overlay" id="introText">
+    <div class="intro-text-box">
+      <h1>SKLEPP</h1>
+      <p class="intro-welcome">Добро пожаловать</p>
+      <p class="intro-desc">Производитель ритуальной фурнитуры для агентств по Беларуси и России. Качественные изделия с полным контролем производства.</p>
+      <div class="intro-divider"></div>
+      <p class="intro-question">Выберите ваш регион</p>
+      <div class="region-btns">
+        <button class="region-btn" onclick="selectRegion('RU')">Россия</button>
+        <button class="region-btn" onclick="selectRegion('BY')">Беларусь</button>
+      </div>
+    </div>
+  </div>
+</div><!-- Header -->
+<header class="header solid">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-brand">
+        <a href="/"><h1>S<span>K</span>LEPP</h1></a>
+        <span class="header-sub">Ритуальная фурнитура</span>
+      </div>
+      <nav class="main-nav">
+        <a href="/">Главная</a>
+        <a href="/catalog">Каталог</a>
+        <a href="/about">О нас</a>
+        <a href="/delivery">Доставка</a>
+        <a href="/contacts" class="active">Контакты</a>
+        <a href="/faq">Вопросы</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <div class="region-indicator" id="regionIndicator" onclick="showIntro()" style="display:none">
+        <span class="ri-flag" id="riFlag">RU</span>
+        <span id="riName">Россия</span>
+        <span class="ri-change">Сменить</span>
+      </div>
+      <a href="/cart" class="cart-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span class="cart-badge" id="cart-badge">0</span>
+      </a>
+      <button class="burger" id="burger" onclick="toggleMobile()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-close" onclick="toggleMobile()">✕</button>
+  <a href="/" onclick="toggleMobile()">Главная</a>
+  <a href="/catalog" onclick="toggleMobile()">Каталог</a>
+  <a href="/about" onclick="toggleMobile()">О нас</a>
+  <a href="/delivery" onclick="toggleMobile()">Доставка</a>
+  <a href="/contacts" onclick="toggleMobile()">Контакты</a>
+  <a href="/faq" onclick="toggleMobile()">Вопросы</a>
+  <a href="/cart" onclick="toggleMobile()">Корзина</a>
+</div>
+
+<div class="contacts-hero">
+  <div class="container">
+    <div class="sec-tag">Контакты</div>
+    <h1 class="sec-title">Свяжитесь с <em>нами</em></h1>
+  </div>
+</div>
+
+<div class="container">
+  <div class="contacts-content">
+    <div class="contacts-grid">
+      <div class="contacts-info">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div class="contact-text">
+            <h3>Телефон</h3>
+            <p><a href="tel:+375296832303">+375 (29) 683-23-03</a></p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="contact-text">
+            <h3>Адрес офиса</h3>
+            <p>г. Барановичи, ул. Холостякова 63а</p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="contact-text">
+            <h3>Контактное лицо</h3>
+            <p>Дыдышко Дмитрий Сергеевич</p>
+          </div>
+        </div>
+
+        <div class="work-hours">
+          <h3>Режим работы</h3>
+          <table class="hours-table">
+            <tr><td>Понедельник — Пятница</td><td>08:00 — 22:00</td></tr>
+            <tr><td>Суббота</td><td>10:00 — 22:00</td></tr>
+            <tr><td>Воскресенье</td><td>10:00 — 20:00</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="contact-form-card">
+          <h3>Напишите нам</h3>
+          <form id="contactForm">
+            <div class="form-group">
+              <label>Ваше имя *</label>
+              <input type="text" required placeholder="Как к вам обращаться">
+            </div>
+            <div class="form-group">
+              <label>Телефон *</label>
+              <input type="tel" required placeholder="+375 xx xxx xx xx">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="email@example.com">
+            </div>
+            <div class="form-group">
+              <label>Сообщение *</label>
+              <textarea required placeholder="Опишите ваш вопрос или пожелание"></textarea>
+            </div>
+            <button type="submit" class="btn-submit">Отправить сообщение</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="map-wrap">
+      <iframe src="https://www.google.com/maps?q=%D0%B3.+%D0%91%D0%B0%D1%80%D0%B0%D0%BD%D0%BE%D0%B2%D0%B8%D1%87%D0%B8,+%D1%83%D0%BB.+%D0%A5%D0%BE%D0%BB%D0%BE%D1%81%D1%82%D1%8F%D0%BA%D0%BE%D0%B2%D0%B0+63%D0%B0&t=&z=16&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe>
+    </div>
+  </div>
+</div>
+
+<div style="height:80px"></div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-main">
+    <div class="footer-brand">
+      <h3>S<span>K</span>LEPP</h3>
+      <p>Производитель ритуальной фурнитуры для агентств по Беларуси и России. Качественные изделия с полным контролем производства.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Навигация</h4>
+      <ul>
+        <li><a href="/">Главная</a></li>
+        <li><a href="/catalog">Каталог</a></li>
+        <li><a href="/about">О компании</a></li>
+        <li><a href="/delivery">Доставка и оплата</a></li>
+        <li><a href="/contacts">Контакты</a></li>
+        <li><a href="/faq">Вопросы</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Каталог</h4>
+      <ul>
+        {% for cat in categories %}
+          <li><a href="/catalog?category={{ cat.id }}">{{ cat.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="footer-col footer-contacts">
+      <h4>Контакты</h4>
+      <p class="fc-label">Телефон</p>
+      <p>+375 (29) 683-23-03</p>
+      <p class="fc-label" style="margin-top:12px">Адрес</p>
+      <p>г. Барановичи, ул. Холостякова 63а</p>
+    </div>
+    <div class="footer-col footer-requisites">
+      <h4>Реквизиты</h4>
+      <p class="fc-label">УНП</p>
+      <p>291733213</p>
+      <p class="fc-label">Дата регистрации</p>
+      <p>18.01.2023</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2026 SKLEPP. Все права защищены.</span>
+    <span>
+      <a href="/privacy">Политика конфиденциальности</a> &nbsp;|&nbsp;
+      <a href="/offer">Публичная оферта</a> &nbsp;|&nbsp;
+      УНП 291733213
+    </span>
+  </div>
+</footer>
+
+<div class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+  <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
+</div>
+
+<script src="/static/cart.js"></script>
+<script>
+function toggleMobile() {
+  document.getElementById('mobileNav').classList.toggle('open');
+  document.getElementById('burger').classList.toggle('active');
+}
+
+document.getElementById('contactForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  showToast('Сообщение отправлено! Мы свяжемся с вами в ближайшее время.');
+  this.reset();
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('scrollTop').classList.toggle('vis', window.scrollY > 500);
+});
+
+let currentRegion = localStorage.getItem('sklepp_region') || null;
+
+function selectRegion(region) {
+  currentRegion = region;
+  localStorage.setItem('sklepp_region', region);
+  const introVideo = document.getElementById('introVideo');
+  if (introVideo) introVideo.pause();
+  document.getElementById('introOverlay').classList.add('hidden');
+  document.getElementById('regionIndicator').style.display = 'flex';
+  document.getElementById('riFlag').textContent = region === 'RU' ? 'RU' : 'BY';
+  document.getElementById('riName').textContent = region === 'RU' ? 'Россия (₽)' : 'Беларусь (Br)';
+  updatePrices();
+}
+
+function showIntro() {
+  const introOverlay = document.getElementById('introOverlay');
+  const introVideo = document.getElementById('introVideo');
+  const introText = document.getElementById('introText');
+  introOverlay.classList.remove('hidden');
+  document.getElementById('regionIndicator').style.display = 'none';
+  if (introVideo) {
+    introVideo.currentTime = 0;
+    introText.classList.remove('visible');
+    introVideo.play().catch(() => {});
+    function showIntroText() { introText.classList.add('visible'); }
+    introVideo.addEventListener('timeupdate', function handler() {
+      if (introVideo.duration && introVideo.currentTime >= introVideo.duration * 0.65) {
+        showIntroText();
+        introVideo.removeEventListener('timeupdate', handler);
+      }
+    });
+    setTimeout(showIntroText, 4000);
+  }
+}
+
+function updatePrices() {
+  document.querySelectorAll('.price-display').forEach(el => {
+    const byn = el.dataset.byn;
+    const rub = el.dataset.rub;
+    if (currentRegion === 'RU' && rub) {
+      el.innerHTML = rub + ' <span class="currency">₽</span>';
+    } else {
+      el.innerHTML = byn + ' <span class="currency">Br</span>';
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (currentRegion) {
+    document.getElementById('introOverlay').classList.add('hidden');
+    document.getElementById('regionIndicator').style.display = 'flex';
+    document.getElementById('riFlag').textContent = currentRegion === 'RU' ? 'RU' : 'BY';
+    document.getElementById('riName').textContent = currentRegion === 'RU' ? 'Россия (₽)' : 'Беларусь (Br)';
+    const introVideo = document.getElementById('introVideo');
+    if (introVideo) introVideo.pause();
+  }
+  else {
+    const introVideo = document.getElementById('introVideo');
+    const introText = document.getElementById('introText');
+    if (introVideo) {
+      introVideo.play().catch(() => {});
+      introVideo.addEventListener('timeupdate', function() {
+        if (this.duration && this.currentTime >= this.duration * 0.72) {
+          introText.classList.add('visible');
+        }
+      });
+      introVideo.addEventListener('ended', function() {
+        introText.classList.add('visible');
+      });
+    }
+  }
+});
+
+const preloader = document.getElementById('preloader');
+const bgVideo = document.querySelector('.bg-video video');
+const bgVideoContainer = document.querySelector('.bg-video');
+
+function hidePreloader() { preloader.classList.add('done'); }
+function showVideo() { if (bgVideoContainer) bgVideoContainer.classList.add('ready'); }
+
+if (bgVideo) {
+  bgVideo.addEventListener('canplay', showVideo, { once: true });
+  bgVideo.addEventListener('loadeddata', showVideo, { once: true });
+}
+
+setTimeout(hidePreloader, 2500);
+
+// Smooth video loop
+document.querySelectorAll('.bg-video video').forEach(vid => {
+  vid.addEventListener('ended', function() {
+    this.currentTime = 0;
+    this.play();
+  });
+});
+</script>
+</body>
+</html>
