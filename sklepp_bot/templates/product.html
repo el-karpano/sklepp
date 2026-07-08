@@ -38,10 +38,10 @@ button{cursor:pointer;font-family:var(--body)}
 .lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;cursor:default}
 .lightbox-close{position:absolute;top:20px;right:24px;width:44px;height:44px;border:none;background:rgba(255,255,255,.1);border-radius:50%;color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;z-index:1}
 .lightbox-close:hover{background:rgba(255,255,255,.2)}
-.lightbox-variant{position:absolute;bottom:24px;display:flex;gap:12px}
-.lb-var-btn{padding:10px 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-size:12px;font-weight:500;font-family:var(--body);cursor:pointer;transition:all .3s;letter-spacing:1px}
-.lb-var-btn:hover{border-color:rgba(201,168,76,.4)}
-.lb-var-btn.active{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
+.lightbox-variant{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);display:flex;gap:12px;background:rgba(0,0,0,.6);padding:10px 20px;border-radius:12px;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1)}
+.lb-var-btn{padding:10px 28px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:13px;font-weight:500;font-family:var(--body);cursor:pointer;transition:all .3s;letter-spacing:1px}
+.lb-var-btn:hover{border-color:rgba(201,168,76,.4);color:var(--gold)}
+.lb-var-btn.active{background:rgba(201,168,76,.2);border-color:var(--gold);color:var(--gold);font-weight:600}
 
 .product-gallery{margin-bottom:32px}
 .variant-selector{display:flex;gap:12px;justify-content:center;margin-top:16px}
@@ -221,11 +221,11 @@ button{cursor:pointer;font-family:var(--body)}
     <div class="variant-selector">
       <button class="variant-btn active" onclick="switchPhoto('{{ photo_url }}', this)" data-variant="1">
         <span class="variant-dot" style="background:linear-gradient(135deg,#c9a84c,#8a6f2f)"></span>
-        Вариант 1
+        Бронза
       </button>
       <button class="variant-btn" onclick="switchPhoto('{{ photo_url_2 }}', this)" data-variant="2">
         <span class="variant-dot" style="background:linear-gradient(135deg,#b0b0b0,#707070)"></span>
-        Вариант 2
+        Золото
       </button>
     </div>
     {% endif %}
@@ -317,8 +317,8 @@ button{cursor:pointer;font-family:var(--body)}
   <img id="lbImage" src="{{ photo_url }}" alt="{{ product.name }}">
   {% if photo_url_2 %}
   <div class="lightbox-variant">
-    <button class="lb-var-btn active" onclick="switchLbPhoto('{{ photo_url }}', event, this)">Вариант 1</button>
-    <button class="lb-var-btn" onclick="switchLbPhoto('{{ photo_url_2 }}', event, this)">Вариант 2</button>
+    <button class="lb-var-btn active" onclick="switchLbPhoto('{{ photo_url }}', event, this)">Бронза</button>
+    <button class="lb-var-btn" onclick="switchLbPhoto('{{ photo_url_2 }}', event, this)">Золото</button>
   </div>
   {% endif %}
 </div>
