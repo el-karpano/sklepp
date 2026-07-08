@@ -115,29 +115,25 @@ button{cursor:pointer;font-family:var(--body)}
 
 
 /* Discount banner */
-.discount-banner{background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.03));border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:none}
+.discount-banner{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:none}
 .discount-banner.show{display:block}
-.discount-banner-title{font-family:var(--heading);font-size:16px;font-weight:400;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-.discount-banner-title svg{width:18px;height:18px;stroke:#22c55e;fill:none;stroke-width:2}
+.discount-banner-title{font-family:var(--heading);font-size:16px;font-weight:400;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.discount-banner-title svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:2}
 .discount-tiers{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
-.discount-tier{font-size:11px;color:var(--grey);padding:6px 12px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
-.discount-tier.active{color:#22c55e;border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.06);font-weight:600}
+.discount-tier{font-size:11px;color:var(--grey);padding:6px 12px;border-radius:6px;background:rgba(201,168,76,.04);border:1px solid rgba(201,168,76,.08)}
+.discount-tier.active{color:var(--gold);border-color:rgba(201,168,76,.25);background:rgba(201,168,76,.08);font-weight:600}
 
 /* Discount applied in summary */
 .summary-discount{display:none}
 .summary-discount.show{display:flex}
-.summary-discount .summary-label{color:#22c55e}
-.summary-discount .summary-val{color:#22c55e;font-weight:600}
+.summary-discount .summary-label{color:var(--gold)}
+.summary-discount .summary-val{color:var(--gold);font-weight:600}
 .summary-old-total{display:none;text-decoration:line-through;color:var(--grey);font-size:13px}
 .summary-old-total.show{display:block}
-.savings-badge{display:none;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px 16px;margin-top:8px;text-align:center}
-.savings-badge.show{display:block}
-.savings-badge-text{font-size:13px;color:#22c55e;font-weight:600}
-.savings-badge-sub{font-size:11px;color:var(--grey);margin-top:2px}
 
 /* Item discounted price */
 .item-price-old{text-decoration:line-through;color:var(--grey);font-size:12px;margin-right:6px}
-.item-price-new{color:#22c55e;font-weight:600}
+.item-price-new{color:var(--gold);font-weight:600}
 
 @media(max-width:640px){.container{padding:16px}.cart-item{padding:12px;gap:10px}.item-img,.item-no-img{width:64px;height:64px}.item-total{min-width:60px}.item-total-val{font-size:14px}.discount-tiers{flex-direction:column}}
 
@@ -278,10 +274,6 @@ button{cursor:pointer;font-family:var(--body)}
       </div>
       <div class="summary-old-total" id="oldTotalRow">
         <span>Было: <span id="oldTotalPrice">0</span></span>
-      </div>
-      <div class="savings-badge" id="savingsBadge">
-        <div class="savings-badge-text" id="savingsText">Вы экономите: 0 ₽</div>
-        <div class="savings-badge-sub" id="savingsSub"></div>
       </div>
     </div>
 
@@ -519,7 +511,6 @@ function renderCart() {
   // Summary
   const discountRow = document.getElementById('discountRow');
   const oldTotalRow = document.getElementById('oldTotalRow');
-  const savingsBadge = document.getElementById('savingsBadge');
 
   if (isRU && discountRate > 0) {
     const saved = totalRub * discountRate;
@@ -538,19 +529,9 @@ function renderCart() {
 
     oldTotalRow.classList.add('show');
     document.getElementById('oldTotalPrice').textContent = formatNum(totalRub) + ' ₽';
-
-    savingsBadge.classList.add('show');
-    document.getElementById('savingsText').textContent = 'Вы экономите: ' + formatNum(saved) + ' ₽';
-    const nextTier = totalRub < 60000
-      ? `Ещё ${formatNum(60000 - totalRub)} ₽ до скидки 10%`
-      : totalRub < 100000
-        ? `Ещё ${formatNum(100000 - totalRub)} ₽ до скидки 15%`
-        : 'Максимальная скидка!';
-    document.getElementById('savingsSub').textContent = nextTier;
   } else {
     discountRow.classList.remove('show');
     oldTotalRow.classList.remove('show');
-    savingsBadge.classList.remove('show');
 
     if (isRU) {
       document.getElementById('totalPrice').textContent = formatNum(totalRub) + ' ₽';
