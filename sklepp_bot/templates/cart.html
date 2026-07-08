@@ -114,7 +114,32 @@ button{cursor:pointer;font-family:var(--body)}
 .region-btn:hover::before{transform:scaleX(1)}
 
 
-@media(max-width:640px){.container{padding:16px}.cart-item{padding:12px;gap:10px}.item-img,.item-no-img{width:64px;height:64px}.item-total{min-width:60px}.item-total-val{font-size:14px}}
+/* Discount banner */
+.discount-banner{background:linear-gradient(135deg,rgba(34,197,94,.08),rgba(34,197,94,.03));border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:none}
+.discount-banner.show{display:block}
+.discount-banner-title{font-family:var(--heading);font-size:16px;font-weight:400;color:#22c55e;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.discount-banner-title svg{width:18px;height:18px;stroke:#22c55e;fill:none;stroke-width:2}
+.discount-tiers{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.discount-tier{font-size:11px;color:var(--grey);padding:6px 12px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+.discount-tier.active{color:#22c55e;border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.06);font-weight:600}
+
+/* Discount applied in summary */
+.summary-discount{display:none}
+.summary-discount.show{display:flex}
+.summary-discount .summary-label{color:#22c55e}
+.summary-discount .summary-val{color:#22c55e;font-weight:600}
+.summary-old-total{display:none;text-decoration:line-through;color:var(--grey);font-size:13px}
+.summary-old-total.show{display:block}
+.savings-badge{display:none;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:10px 16px;margin-top:8px;text-align:center}
+.savings-badge.show{display:block}
+.savings-badge-text{font-size:13px;color:#22c55e;font-weight:600}
+.savings-badge-sub{font-size:11px;color:var(--grey);margin-top:2px}
+
+/* Item discounted price */
+.item-price-old{text-decoration:line-through;color:var(--grey);font-size:12px;margin-right:6px}
+.item-price-new{color:#22c55e;font-weight:600}
+
+@media(max-width:640px){.container{padding:16px}.cart-item{padding:12px;gap:10px}.item-img,.item-no-img{width:64px;height:64px}.item-total{min-width:60px}.item-total-val{font-size:14px}.discount-tiers{flex-direction:column}}
 
 #preloader{position:fixed;inset:0;background:var(--bg);z-index:100000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:32px;transition:opacity .8s,visibility .8s}
 #preloader.done{opacity:0;visibility:hidden;pointer-events:none}
@@ -216,6 +241,21 @@ button{cursor:pointer;font-family:var(--body)}
   </div>
 
   <div id="cartContent" style="display:none;">
+    <div class="discount-banner" id="discountBanner">
+      <div class="discount-banner-title">
+        <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Скидка на оптовый заказ
+      </div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.7">
+        При заказе от <b style="color:var(--white)">60 000 ₽</b> — скидка <b style="color:#22c55e">10%</b><br>
+        При заказе от <b style="color:var(--white)">100 000 ₽</b> — скидка <b style="color:#22c55e">15%</b>
+      </div>
+      <div class="discount-tiers" id="discountTiers">
+        <div class="discount-tier" id="tier10">от 60 000 ₽ → 10%</div>
+        <div class="discount-tier" id="tier15">от 100 000 ₽ → 15%</div>
+      </div>
+    </div>
+
     <div class="cart-items" id="cartItems"></div>
 
     <div class="cart-summary">
@@ -224,6 +264,10 @@ button{cursor:pointer;font-family:var(--body)}
         <span class="summary-val" id="totalCount">0</span>
       </div>
       <div class="summary-divider"></div>
+      <div class="summary-row summary-discount" id="discountRow">
+        <span class="summary-label" id="discountLabel">Скидка 0%:</span>
+        <span class="summary-val" id="discountAmount">-0 ₽</span>
+      </div>
       <div class="summary-row summary-total">
         <span class="summary-label">Итого:</span>
         <span class="summary-val" id="totalPrice">0 Br</span>
@@ -231,6 +275,13 @@ button{cursor:pointer;font-family:var(--body)}
       <div class="summary-row">
         <span class="summary-label"></span>
         <span class="summary-val" id="totalSub" style="color:var(--grey);font-size:12px;">0 ₽</span>
+      </div>
+      <div class="summary-old-total" id="oldTotalRow">
+        <span>Было: <span id="oldTotalPrice">0</span></span>
+      </div>
+      <div class="savings-badge" id="savingsBadge">
+        <div class="savings-badge-text" id="savingsText">Вы экономите: 0 ₽</div>
+        <div class="savings-badge-sub" id="savingsSub"></div>
       </div>
     </div>
 
@@ -371,6 +422,16 @@ function toggleMobile() {
   document.getElementById('burger').classList.toggle('active');
 }
 
+function getDiscount(totalRub) {
+  if (totalRub >= 100000) return 0.15;
+  if (totalRub >= 60000) return 0.10;
+  return 0;
+}
+
+function formatNum(n) {
+  return n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
 function renderCart() {
   const items = Cart.getItems();
   const emptyEl = document.getElementById('emptyCart');
@@ -388,6 +449,9 @@ function renderCart() {
   itemsEl.innerHTML = '';
 
   const isRU = currentRegion === 'RU';
+  const totalRub = Cart.getTotalRub();
+  const discountRate = isRU ? getDiscount(totalRub) : 0;
+  const discountPct = Math.round(discountRate * 100);
 
   items.forEach(item => {
     const priceByn = parseFloat(item.price_byn) || 0;
@@ -399,10 +463,17 @@ function renderCart() {
     const subCurrency = isRU ? 'Br' : '₽';
     const mainCurrency = isRU ? '₽' : 'Br';
 
-    const totalMain = (unitPrice * item.quantity).toFixed(2);
+    const lineTotal = unitPrice * item.quantity;
+    const lineDiscount = lineTotal * discountRate;
+    const lineAfter = lineTotal - lineDiscount;
+
     const totalSub = (subUnit * item.quantity).toFixed(2);
 
     const photoUrl = item.image_url && !item.image_url.includes('no_image') ? item.image_url : null;
+
+    const priceDisplay = isRU && discountRate > 0
+      ? `<span class="item-price-old">${formatNum(lineTotal)} ₽</span><span class="item-price item-price-new">${formatNum(lineAfter)} ₽</span>`
+      : `<span class="item-price">${unitPrice} ${mainCurrency}</span>`;
 
     const div = document.createElement('div');
     div.className = 'cart-item';
@@ -410,7 +481,7 @@ function renderCart() {
       ${photoUrl ? `<img class="item-img" src="${photoUrl}" alt="${item.name}">` : `<div class="item-no-img">Нет фото</div>`}
       <div class="item-info">
         <div class="item-name">${item.name}</div>
-        <div class="item-price">${unitPrice} ${mainCurrency}</div>
+        <div>${priceDisplay}</div>
         ${moq > 1 ? `<div class="item-moq">Мин. ${moq} шт.</div>` : ''}
       </div>
       <div class="item-qty">
@@ -420,7 +491,10 @@ function renderCart() {
         <button class="item-qty-btn" onclick="changeItemQty('${item.id}', ${moq})">+</button>
       </div>
       <div class="item-total">
-        <div class="item-total-val">${totalMain} ${mainCurrency}</div>
+        ${isRU && discountRate > 0
+          ? `<div class="item-total-val"><span class="item-price-old">${formatNum(lineTotal)} ₽</span> ${formatNum(lineAfter)} ₽</div>`
+          : `<div class="item-total-val">${formatNum(lineTotal)} ${mainCurrency}</div>`
+        }
         <div class="item-total-sub">${totalSub} ${subCurrency}</div>
       </div>
       <button class="item-remove" onclick="removeItem('${item.id}')" title="Удалить">✕</button>
@@ -430,12 +504,61 @@ function renderCart() {
 
   document.getElementById('totalCount').textContent = Cart.getCount();
 
+  // Discount banner
+  const banner = document.getElementById('discountBanner');
+  const tier10 = document.getElementById('tier10');
+  const tier15 = document.getElementById('tier15');
   if (isRU) {
-    document.getElementById('totalPrice').textContent = Cart.getTotalRub().toFixed(2) + ' ₽';
-    document.getElementById('totalSub').textContent = Cart.getTotalByn().toFixed(2) + ' Br';
+    banner.classList.add('show');
+    tier10.classList.toggle('active', totalRub >= 60000 && totalRub < 100000);
+    tier15.classList.toggle('active', totalRub >= 100000);
   } else {
-    document.getElementById('totalPrice').textContent = Cart.getTotalByn().toFixed(2) + ' Br';
-    document.getElementById('totalSub').textContent = Cart.getTotalRub().toFixed(2) + ' ₽';
+    banner.classList.remove('show');
+  }
+
+  // Summary
+  const discountRow = document.getElementById('discountRow');
+  const oldTotalRow = document.getElementById('oldTotalRow');
+  const savingsBadge = document.getElementById('savingsBadge');
+
+  if (isRU && discountRate > 0) {
+    const saved = totalRub * discountRate;
+    const finalTotal = totalRub - saved;
+
+    discountRow.classList.add('show');
+    document.getElementById('discountLabel').textContent = `Скидка ${discountPct}%:`;
+    document.getElementById('discountAmount').textContent = '-' + formatNum(saved) + ' ₽';
+
+    document.getElementById('totalPrice').textContent = formatNum(finalTotal) + ' ₽';
+
+    // Sub currency (BYN) also discounted
+    const totalByn = Cart.getTotalByn();
+    const bynSaved = totalByn * discountRate;
+    document.getElementById('totalSub').textContent = formatNum(totalByn - bynSaved) + ' Br';
+
+    oldTotalRow.classList.add('show');
+    document.getElementById('oldTotalPrice').textContent = formatNum(totalRub) + ' ₽';
+
+    savingsBadge.classList.add('show');
+    document.getElementById('savingsText').textContent = 'Вы экономите: ' + formatNum(saved) + ' ₽';
+    const nextTier = totalRub < 60000
+      ? `Ещё ${formatNum(60000 - totalRub)} ₽ до скидки 10%`
+      : totalRub < 100000
+        ? `Ещё ${formatNum(100000 - totalRub)} ₽ до скидки 15%`
+        : 'Максимальная скидка!';
+    document.getElementById('savingsSub').textContent = nextTier;
+  } else {
+    discountRow.classList.remove('show');
+    oldTotalRow.classList.remove('show');
+    savingsBadge.classList.remove('show');
+
+    if (isRU) {
+      document.getElementById('totalPrice').textContent = formatNum(totalRub) + ' ₽';
+      document.getElementById('totalSub').textContent = Cart.getTotalByn().toFixed(2) + ' Br';
+    } else {
+      document.getElementById('totalPrice').textContent = Cart.getTotalByn().toFixed(2) + ' Br';
+      document.getElementById('totalSub').textContent = formatNum(totalRub) + ' ₽';
+    }
   }
 }
 
@@ -479,6 +602,10 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
   btn.textContent = 'Отправка...';
 
   const items = Cart.getItems();
+  const totalRub = Cart.getTotalRub();
+  const isRU = currentRegion === 'RU';
+  const discountRate = isRU ? getDiscount(totalRub) : 0;
+
   const data = {
     name: document.getElementById('cName').value,
     phone: document.getElementById('cPhone').value,
@@ -486,6 +613,7 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     email: document.getElementById('cEmail').value,
     comment: document.getElementById('cComment').value,
     region: currentRegion || 'BY',
+    discount_percent: Math.round(discountRate * 100),
     items: items.map(i => ({
       product_id: i.id,
       name: i.name,

@@ -194,6 +194,8 @@ def order():
 
     region = data.get("region", "BY")
     is_ru = region == "RU"
+    discount_pct = int(data.get("discount_percent", 0))
+    discount_rate = discount_pct / 100.0 if discount_pct > 0 else 0
 
     total_byn = 0
     total_rub = 0
@@ -261,10 +263,26 @@ def order():
     if data.get("email"):
         msg += f"📧 Email: {data['email']}\n"
     msg += "\n" + "\n".join(order_lines) + "\n"
-    if is_ru:
-        msg += f"\n💰 Итого: {total_rub:.2f} ₽\n"
+
+    if discount_rate > 0:
+        saved_rub = total_rub * discount_rate
+        saved_byn = total_byn * discount_rate
+        final_rub = total_rub - saved_rub
+        final_byn = total_byn - saved_byn
+        if is_ru:
+            msg += f"\n💰 Итого (до скидки): {total_rub:.2f} ₽"
+            msg += f"\n🏷 Скидка {discount_pct}%: -{saved_rub:.2f} ₽"
+            msg += f"\n✅ К оплате: {final_rub:.2f} ₽"
+        else:
+            msg += f"\n💰 Итого (до скидки): {total_byn:.2f} Br"
+            msg += f"\n🏷 Скидка {discount_pct}%: -{saved_byn:.2f} Br"
+            msg += f"\n✅ К оплате: {final_byn:.2f} Br"
     else:
-        msg += f"\n💰 Итого: {total_byn:.2f} Br\n"
+        if is_ru:
+            msg += f"\n💰 Итого: {total_rub:.2f} ₽\n"
+        else:
+            msg += f"\n💰 Итого: {total_byn:.2f} Br\n"
+
     if data.get("comment"):
         msg += f"\n💬 Комментарий: {data['comment']}\n"
     msg += "━━━━━━━━━━━━━━━━━━━━━━━━━"
