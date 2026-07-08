@@ -224,6 +224,8 @@ def order():
 
         sub = subs[0]
         item_name = item.get("name") or sub.get("name", "?")
+        variant = item.get("variant", 1)
+        variant_label = " (золото)" if variant == 2 else " (бронза)"
         price_byn = float(sub.get("price_byn", 0)) * quantity
         price_rub = float(sub.get("price_rub", 0)) * quantity
 
@@ -231,9 +233,9 @@ def order():
         total_rub += price_rub
 
         if is_ru:
-            order_lines.append(f"  • {item_name} × {quantity} = {price_rub:.2f} ₽")
+            order_lines.append(f"  • {item_name}{variant_label} × {quantity} = {price_rub:.2f} ₽")
         else:
-            order_lines.append(f"  • {item_name} × {quantity} = {price_byn:.2f} Br")
+            order_lines.append(f"  • {item_name}{variant_label} × {quantity} = {price_byn:.2f} Br")
 
         db_post("orders", {
             "customer_name": data["name"],

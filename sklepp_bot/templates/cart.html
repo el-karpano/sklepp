@@ -622,7 +622,8 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
       name: i.name,
       price_byn: i.price_byn,
       price_rub: i.price_rub,
-      quantity: i.quantity
+      quantity: i.quantity,
+      variant: i.variant || 1
     }))
   };
 
