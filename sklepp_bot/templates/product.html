@@ -30,8 +30,15 @@ button{cursor:pointer;font-family:var(--body)}
 .back:hover{color:var(--gold)}
 .back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 
-.product-image{width:50%;max-height:400px;object-fit:contain;border-radius:16px;background:#fff;padding:20px;margin:0 auto 32px;display:block;transition:transform .4s}
+.product-image{width:50%;max-height:400px;object-fit:contain;border-radius:16px;background:#fff;padding:20px;margin:0 auto 32px;display:block;transition:transform .4s,opacity .3s}
 .product-image:hover{transform:scale(1.02)}
+
+.product-gallery{margin-bottom:32px}
+.variant-selector{display:flex;gap:12px;justify-content:center;margin-top:16px}
+.variant-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;color:var(--grey);font-size:12px;font-weight:500;font-family:var(--body);cursor:pointer;transition:all .3s;letter-spacing:.5px}
+.variant-btn:hover{border-color:rgba(201,168,76,.2);color:var(--white)}
+.variant-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.06)}
+.variant-dot{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.15)}
 .no-photo{width:100%;height:320px;background:linear-gradient(135deg,#1a1a1a 0%,#111 100%);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:rgba(201,168,76,.2);margin-bottom:32px;border-radius:16px}
 
 .product-info{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);padding:36px;margin-bottom:24px;border-radius:16px}
@@ -191,11 +198,28 @@ button{cursor:pointer;font-family:var(--body)}
   </a>
 
   {% set photo_url = get_photo_url(product.image_url) %}
-  {% if photo_url %}
-    <img src="{{ photo_url }}" class="product-image" alt="{{ product.name }}">
-  {% else %}
-    <div class="no-photo">Нет фото</div>
-  {% endif %}
+  {% set photo_url_2 = get_photo_url(product.image_url_2) %}
+
+  <div class="product-gallery">
+    {% if photo_url %}
+      <img src="{{ photo_url }}" class="product-image" id="mainPhoto" alt="{{ product.name }}">
+    {% else %}
+      <div class="no-photo">Нет фото</div>
+    {% endif %}
+
+    {% if photo_url_2 %}
+    <div class="variant-selector">
+      <button class="variant-btn active" onclick="switchPhoto('{{ photo_url }}', this)" data-variant="gold">
+        <span class="variant-dot" style="background:linear-gradient(135deg,#c9a84c,#8a6f2f)"></span>
+        Золото
+      </button>
+      <button class="variant-btn" onclick="switchPhoto('{{ photo_url_2 }}', this)" data-variant="silver">
+        <span class="variant-dot" style="background:linear-gradient(135deg,#b0b0b0,#707070)"></span>
+        Серебро
+      </button>
+    </div>
+    {% endif %}
+  </div>
 
   <div class="product-info">
     <div class="product-name">{{ product.name }}</div>
@@ -357,6 +381,19 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function switchPhoto(url, btn) {
+  const img = document.getElementById('mainPhoto');
+  if (img) {
+    img.style.opacity = '0';
+    setTimeout(() => {
+      img.src = url;
+      img.style.opacity = '1';
+    }, 200);
+  }
+  document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 function toggleMobile() {
