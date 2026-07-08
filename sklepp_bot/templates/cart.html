@@ -131,6 +131,11 @@ button{cursor:pointer;font-family:var(--body)}
 .summary-old-total{display:none;text-decoration:line-through;color:var(--grey);font-size:13px}
 .summary-old-total.show{display:block}
 
+.variant-selector-cart{display:flex;gap:6px;margin-bottom:6px}
+.variant-chip-cart{padding:4px 10px;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(201,168,76,.1);border-radius:4px;background:transparent;color:var(--grey);cursor:pointer;transition:all .2s;font-family:var(--body)}
+.variant-chip-cart:hover{border-color:rgba(201,168,76,.3);color:var(--white)}
+.variant-chip-cart.active{background:rgba(201,168,76,.1);border-color:var(--gold);color:var(--gold)}
+
 /* Item discounted price */
 .item-price-old{text-decoration:line-through;color:var(--grey);font-size:12px;margin-right:6px}
 .item-price-new{color:var(--gold);font-weight:600}
@@ -462,25 +467,36 @@ function renderCart() {
     const totalSub = (subUnit * item.quantity).toFixed(2);
 
     const photoUrl = item.image_url && !item.image_url.includes('no_image') ? item.image_url : null;
+    const photoUrl2 = item.image_url_2 && !item.image_url_2.includes('no_image') ? item.image_url_2 : null;
+    const currentVariant = item.variant || 1;
+    const displayPhoto = currentVariant === 2 && photoUrl2 ? photoUrl2 : photoUrl;
 
     const priceDisplay = isRU && discountRate > 0
       ? `<span class="item-price-old">${formatNum(lineTotal)} ₽</span><span class="item-price item-price-new">${formatNum(lineAfter)} ₽</span>`
       : `<span class="item-price">${unitPrice} ${mainCurrency}</span>`;
 
+    const hasVariant = !!photoUrl2;
+    const variantHtml = hasVariant ? `
+      <div class="variant-selector-cart">
+        <button class="variant-chip-cart ${currentVariant===1?'active':''}" onclick="changeCartVariant('${item.id}', ${currentVariant}, 1)">Вариант 1</button>
+        <button class="variant-chip-cart ${currentVariant===2?'active':''}" onclick="changeCartVariant('${item.id}', ${currentVariant}, 2)">Вариант 2</button>
+      </div>` : '';
+
     const div = document.createElement('div');
     div.className = 'cart-item';
     div.innerHTML = `
-      ${photoUrl ? `<img class="item-img" src="${photoUrl}" alt="${item.name}">` : `<div class="item-no-img">Нет фото</div>`}
+      ${displayPhoto ? `<img class="item-img" src="${displayPhoto}" alt="${item.name}">` : `<div class="item-no-img">Нет фото</div>`}
       <div class="item-info">
         <div class="item-name">${item.name}</div>
+        ${variantHtml}
         <div>${priceDisplay}</div>
         ${moq > 1 ? `<div class="item-moq">Мин. ${moq} шт.</div>` : ''}
       </div>
       <div class="item-qty">
-        <button class="item-qty-btn" onclick="changeItemQty('${item.id}', -${moq})">−</button>
+        <button class="item-qty-btn" onclick="changeItemQty('${item.id}', -${moq}, ${currentVariant})">−</button>
         <input class="item-qty-val" type="number" value="${item.quantity}" min="${moq}" step="${moq}"
-            onchange="setItemQty('${item.id}', this.value, ${moq})">
-        <button class="item-qty-btn" onclick="changeItemQty('${item.id}', ${moq})">+</button>
+            onchange="setItemQty('${item.id}', this.value, ${moq}, ${currentVariant})">
+        <button class="item-qty-btn" onclick="changeItemQty('${item.id}', ${moq}, ${currentVariant})">+</button>
       </div>
       <div class="item-total">
         ${isRU && discountRate > 0
@@ -489,7 +505,7 @@ function renderCart() {
         }
         <div class="item-total-sub">${totalSub} ${subCurrency}</div>
       </div>
-      <button class="item-remove" onclick="removeItem('${item.id}')" title="Удалить">✕</button>
+      <button class="item-remove" onclick="removeItem('${item.id}', ${currentVariant})" title="Удалить">✕</button>
     `;
     itemsEl.appendChild(div);
   });
@@ -543,28 +559,34 @@ function renderCart() {
   }
 }
 
-function changeItemQty(id, delta) {
+function changeItemQty(id, delta, variant) {
   const items = Cart.getItems();
-  const item = items.find(i => i.id === id);
+  const v = variant || 1;
+  const item = items.find(i => i.id === id && (i.variant || 1) === v);
   if (item) {
     const moq = item.min_order || 1;
     const newQty = item.quantity + delta;
-    if (newQty < moq) Cart.remove(id);
-    else Cart.updateQuantity(id, newQty);
+    if (newQty < moq) Cart.remove(id, v);
+    else Cart.updateQuantity(id, newQty, v);
     renderCart();
   }
 }
 
-function setItemQty(id, val, moq) {
+function setItemQty(id, val, moq, variant) {
   moq = moq || 1;
   let qty = parseInt(val) || moq;
-  if (qty < moq) Cart.remove(id);
-  else Cart.updateQuantity(id, qty);
+  if (qty < moq) Cart.remove(id, variant);
+  else Cart.updateQuantity(id, qty, variant);
   renderCart();
 }
 
-function removeItem(id) {
-  Cart.remove(id);
+function removeItem(id, variant) {
+  Cart.remove(id, variant);
+  renderCart();
+}
+
+function changeCartVariant(id, oldVariant, newVariant) {
+  Cart.updateVariant(id, oldVariant, newVariant);
   renderCart();
 }
 

@@ -58,6 +58,10 @@
 .p-btn{padding:12px 20px;border:none;border-radius:6px;cursor:pointer;font-size:10px;font-weight:700;text-decoration:none;transition:all .3s;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--body)}
 .p-btn-cart{flex:1;background:linear-gradient(135deg,var(--gold),var(--gold-dk));color:var(--bg);text-align:center}
 .p-btn-cart:hover{box-shadow:0 4px 16px rgba(201,168,76,.2);transform:translateY(-1px)}
+.variant-row{display:flex;gap:6px;margin-bottom:8px}
+.variant-chip{padding:5px 10px;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(201,168,76,.1);border-radius:4px;background:transparent;color:var(--grey);cursor:pointer;transition:all .2s;font-family:var(--body)}
+.variant-chip:hover{border-color:rgba(201,168,76,.3);color:var(--white)}
+.variant-chip.active{background:rgba(201,168,76,.1);border-color:var(--gold);color:var(--gold)}
 .qty-selector{display:inline-flex;align-items:center;gap:0;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);border-radius:6px;overflow:hidden}
 .qty-btn{width:36px;height:36px;border:none;background:transparent;color:var(--gold);font-size:16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .qty-btn:hover{background:rgba(201,168,76,.15)}
@@ -228,12 +232,20 @@
             </div>
           </a>
           <div class="p-card-actions" onclick="event.stopPropagation()">
-            <div class="qty-selector" data-product-id="{{ p.id }}" data-min="{{ moq }}" data-step="{{ moq }}">
-              <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
-              <input type="number" class="qty-value" value="{{ moq }}" min="{{ moq }}" readonly>
-              <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+            {% if p.image_url_2 %}
+            <div class="variant-row" data-product-id="{{ p.id }}">
+              <button class="variant-chip active" onclick="selectCardVariant(this, '{{ p.id }}', 1)">Вариант 1</button>
+              <button class="variant-chip" onclick="selectCardVariant(this, '{{ p.id }}', 2)">Вариант 2</button>
             </div>
-            <button class="qty-add" onclick='addCartWithQty(this, {{ p|tojson }})'>В корзину</button>
+            {% endif %}
+            <div style="display:flex;gap:0;width:100%">
+              <div class="qty-selector" data-product-id="{{ p.id }}" data-min="{{ moq }}" data-step="{{ moq }}">
+                <button class="qty-btn" onclick="changeQty(this, -1)">−</button>
+                <input type="number" class="qty-value" value="{{ moq }}" min="{{ moq }}" readonly>
+                <button class="qty-btn" onclick="changeQty(this, 1)">+</button>
+              </div>
+              <button class="qty-add" onclick='addCartWithQty(this, {{ p|tojson }})'>В корзину</button>
+            </div>
           </div>
         </div>
       {% endfor %}
@@ -371,8 +383,23 @@ function addCartWithQty(btn, product) {
   const actions = btn.closest('.p-card-actions');
   const selector = actions.querySelector('.qty-selector');
   const qty = parseInt(selector.querySelector('.qty-value').value) || 1;
+  const variantRow = actions.querySelector('.variant-row');
+  let variant = 1;
+  if (variantRow) {
+    const active = variantRow.querySelector('.variant-chip.active');
+    if (active) variant = parseInt(active.dataset.variant) || 1;
+  }
+  const cartProduct = {
+    id: product.id,
+    name: product.name,
+    price_byn: product.price_byn,
+    price_rub: product.price_rub,
+    image_url: product.image_url || null,
+    image_url_2: product.image_url_2 || null,
+    min_order: product.min_order || 1
+  };
   const items = Cart.getItems();
-  const existing = items.find(i => i.id === product.id);
+  const existing = items.find(i => i.id === product.id && (i.variant || 1) === variant);
   if (existing) {
     existing.quantity += qty;
   } else {
@@ -382,12 +409,20 @@ function addCartWithQty(btn, product) {
       price_byn: product.price_byn,
       price_rub: product.price_rub,
       image_url: product.image_url || null,
+      image_url_2: product.image_url_2 || null,
       min_order: product.min_order || 1,
-      quantity: qty
+      quantity: qty,
+      variant: variant
     });
   }
   Cart.save(items);
   showToast('Добавлено в корзину (' + qty + ' шт.)');
+}
+
+function selectCardVariant(btn, productId, variant) {
+  const row = btn.closest('.variant-row');
+  row.querySelectorAll('.variant-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 }
 
 function showToast(msg) {

@@ -30,8 +30,18 @@ button{cursor:pointer;font-family:var(--body)}
 .back:hover{color:var(--gold)}
 .back svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
 
-.product-image{width:50%;max-height:400px;object-fit:contain;border-radius:16px;background:#fff;padding:20px;margin:0 auto 32px;display:block;transition:transform .4s,opacity .3s}
+.product-image{width:50%;max-height:400px;object-fit:contain;border-radius:16px;background:#fff;padding:20px;margin:0 auto 32px;display:block;transition:transform .4s,opacity .3s;cursor:zoom-in}
 .product-image:hover{transform:scale(1.02)}
+
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100000;align-items:center;justify-content:center;cursor:zoom-out;padding:40px}
+.lightbox.show{display:flex}
+.lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;cursor:default}
+.lightbox-close{position:absolute;top:20px;right:24px;width:44px;height:44px;border:none;background:rgba(255,255,255,.1);border-radius:50%;color:#fff;font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;z-index:1}
+.lightbox-close:hover{background:rgba(255,255,255,.2)}
+.lightbox-variant{position:absolute;bottom:24px;display:flex;gap:12px}
+.lb-var-btn{padding:10px 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-size:12px;font-weight:500;font-family:var(--body);cursor:pointer;transition:all .3s;letter-spacing:1px}
+.lb-var-btn:hover{border-color:rgba(201,168,76,.4)}
+.lb-var-btn.active{background:rgba(201,168,76,.15);border-color:var(--gold);color:var(--gold)}
 
 .product-gallery{margin-bottom:32px}
 .variant-selector{display:flex;gap:12px;justify-content:center;margin-top:16px}
@@ -209,13 +219,13 @@ button{cursor:pointer;font-family:var(--body)}
 
     {% if photo_url_2 %}
     <div class="variant-selector">
-      <button class="variant-btn active" onclick="switchPhoto('{{ photo_url }}', this)" data-variant="gold">
+      <button class="variant-btn active" onclick="switchPhoto('{{ photo_url }}', this)" data-variant="1">
         <span class="variant-dot" style="background:linear-gradient(135deg,#c9a84c,#8a6f2f)"></span>
-        Золото
+        Вариант 1
       </button>
-      <button class="variant-btn" onclick="switchPhoto('{{ photo_url_2 }}', this)" data-variant="silver">
+      <button class="variant-btn" onclick="switchPhoto('{{ photo_url_2 }}', this)" data-variant="2">
         <span class="variant-dot" style="background:linear-gradient(135deg,#b0b0b0,#707070)"></span>
-        Серебро
+        Вариант 2
       </button>
     </div>
     {% endif %}
@@ -301,6 +311,19 @@ button{cursor:pointer;font-family:var(--body)}
 
 <div class="toast" id="toast"></div>
 
+{% if photo_url %}
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox(event)">✕</button>
+  <img id="lbImage" src="{{ photo_url }}" alt="{{ product.name }}">
+  {% if photo_url_2 %}
+  <div class="lightbox-variant">
+    <button class="lb-var-btn active" onclick="switchLbPhoto('{{ photo_url }}', event, this)">Вариант 1</button>
+    <button class="lb-var-btn" onclick="switchLbPhoto('{{ photo_url_2 }}', event, this)">Вариант 2</button>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
 <script src="/static/cart.js"></script>
 <script>
 const product = {{ product|tojson }};
@@ -369,8 +392,10 @@ function changeQty(delta) {
 
 function addToCart() {
   const qty = parseInt(document.getElementById('qtyInput').value) || MOQ;
+  const activeVariant = document.querySelector('.variant-btn.active');
+  const variant = activeVariant ? parseInt(activeVariant.dataset.variant) || 1 : 1;
   const rounds = Math.floor(qty / MOQ);
-  for (let i = 0; i < rounds; i++) Cart.add(product);
+  for (let i = 0; i < rounds; i++) Cart.add(product, variant);
   document.getElementById('addCartBtn').style.display = 'none';
   document.getElementById('addedMsg').style.display = 'block';
   showToast('Добавлено в корзину');
@@ -395,6 +420,35 @@ function switchPhoto(url, btn) {
   document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
+
+function openLightbox() {
+  const lb = document.getElementById('lightbox');
+  if (lb) lb.classList.add('show');
+}
+
+function closeLightbox(e) {
+  if (e.target === e.currentTarget || e.target.classList.contains('lightbox-close')) {
+    document.getElementById('lightbox').classList.remove('show');
+  }
+}
+
+function switchLbPhoto(url, e, btn) {
+  e.stopPropagation();
+  document.getElementById('lbImage').src = url;
+  document.querySelectorAll('.lb-var-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const mainImg = document.getElementById('mainPhoto');
+  if (mainImg) mainImg.addEventListener('click', openLightbox);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const lb = document.getElementById('lightbox');
+      if (lb) lb.classList.remove('show');
+    }
+  });
+});
 
 function toggleMobile() {
   document.getElementById('mobileNav').classList.toggle('open');
