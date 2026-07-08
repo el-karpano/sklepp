@@ -47,9 +47,9 @@ button{cursor:pointer;font-family:var(--body)}
 .p-card:hover{border-color:rgba(201,168,76,.2);transform:translateY(-6px);box-shadow:0 20px 40px rgba(0,0,0,.3),0 0 0 1px rgba(201,168,76,.08)}
 .p-card-img{position:relative;background:#fff;border-radius:16px 16px 0 0;height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .p-card-img::after{display:none}
-.p-card-img img{position:absolute;max-width:calc(100% - 40px);max-height:calc(100% - 40px);object-fit:contain}
+.p-card-img .img-main,.p-card-img .img-hover img{position:absolute;max-width:calc(100% - 40px);max-height:calc(100% - 40px);object-fit:contain}
 .p-card-img .img-main{transition:opacity .4s;z-index:1}
-.p-card-img .img-hover{opacity:0;transition:opacity .4s;background:#fff;z-index:2}
+.p-card-img .img-hover{opacity:0;transition:opacity .4s;background:#fff;z-index:2;display:flex;align-items:center;justify-content:center;position:absolute;inset:0}
 .p-card:hover .p-card-img .img-main{opacity:0}
 .p-card:hover .p-card-img .img-hover{opacity:1}
 .no-photo{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:rgba(201,168,76,.15);font-size:12px;background:linear-gradient(135deg,#0a0a12,#111118);letter-spacing:2px;text-transform:uppercase}
@@ -265,7 +265,6 @@ button{cursor:pointer;font-family:var(--body)}
       </div>
     </div>
     <button class="pm-add" id="pmAddBtn" onclick="addToCartPm()">Добавить в корзину</button>
-    <div class="pm-added" id="pmAdded">Добавлено! <a href="/cart">Перейти в корзину →</a></div>
     <a href="/cart" class="pm-add2">Перейти в корзину</a>
   </div>
 </div>
@@ -421,8 +420,6 @@ function openProduct(p) {
   if (pmPhoto2) { varEl.style.display = 'flex'; varEl.querySelectorAll('.pm-var').forEach((b,i) => b.classList.toggle('active', i===0)); }
   else { varEl.style.display = 'none'; }
 
-  document.getElementById('pmAddBtn').style.display = 'block';
-  document.getElementById('pmAdded').style.display = 'none';
   document.getElementById('pmOverlay').classList.add('show');
   document.body.style.overflow = 'hidden';
 }
@@ -445,9 +442,10 @@ function selectPmVariant(btn, variant) {
 function changePmQty(delta) {
   const input = document.getElementById('pmQty');
   const moq = parseInt(input.min) || 1;
+  const step = parseInt(input.step) || moq;
   let val = parseInt(input.value) || moq;
-  val = Math.max(moq, val + delta);
-  val = Math.round(val / moq) * moq;
+  val = val + (delta * step);
+  if (val < moq) val = moq;
   input.value = val;
 }
 
@@ -458,9 +456,7 @@ function addToCartPm() {
   const variant = activeVar ? parseInt(activeVar.dataset.variant) || 1 : 1;
   const rounds = Math.floor(qty / (pmProduct.min_order || 1));
   for (let i = 0; i < rounds; i++) Cart.add(pmProduct, variant);
-  document.getElementById('pmAddBtn').style.display = 'none';
-  document.getElementById('pmAdded').style.display = 'block';
-  showToast('Добавлено в корзину');
+  showToast('Добавлено в корзину (' + qty + ' шт.)');
 }
 
 /* Lightbox */
